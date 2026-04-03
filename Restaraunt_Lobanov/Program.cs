@@ -19,7 +19,7 @@ builder.Services.AddSwaggerGen(option =>
         Description = "Полное руководство для использования запросов находящихся в проекте"
     });
 
-    string PathFile = Path.Combine(System.AppContext.BaseDirectory, "APIUserDinner_Klimov.xml");
+    string PathFile = Path.Combine(System.AppContext.BaseDirectory, "Restaraunt_Lobanov.xml");
     option.IncludeXmlComments(PathFile);
 });
 

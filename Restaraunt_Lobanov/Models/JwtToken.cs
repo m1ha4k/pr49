@@ -7,7 +7,7 @@ namespace Restaraunt_Lobanov.Models
 {
     public class JwtToken
     {
-        static byte[] Key = Encoding.UTF8.GetBytes("PERMAVIAT");
+        static byte[] Key = Encoding.UTF8.GetBytes("PERMAVIAT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         public static string Generate(User user)
         {

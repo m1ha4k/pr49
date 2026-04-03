@@ -21,7 +21,7 @@ namespace Restaraunt_Lobanov.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql("server=localhost;port=3307;database=Restaraunt;uid=root;pwd=;", new MySqlServerVersion(new Version(8, 0, 11)));
+            optionsBuilder.UseMySql("server=127.0.0.1;port=3307;database=Restaraunt;uid=root;pwd=;", new MySqlServerVersion(new Version(8, 0, 11)));
         }
     }
 }

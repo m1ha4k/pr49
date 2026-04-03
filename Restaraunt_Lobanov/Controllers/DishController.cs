@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Restaraunt_Lobanov.Context;
 using Restaraunt_Lobanov.Models;
+using Restaraunt_Lobanov.Models.DTO;
 
 namespace Restaraunt_Lobanov.Controllers
 
@@ -44,14 +45,19 @@ namespace Restaraunt_Lobanov.Controllers
         [HttpGet]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public ActionResult GetDishes()
+        public ActionResult GetDishes([FromQuery] string version)
         {
             DishContext context = new DishContext();
 
             try
             {
-                var dishes = context.Dishes.ToList();
-
+                var dishes = context.Dishes
+                    .Where(x => x.Version == version)
+                    .ToList();
+                if (dishes.Count == 0)
+                {
+                    return Ok(new { message = "Блюда с версией " + version + "не найдены" });
+                }
                 return Ok(dishes);
             }
             catch
@@ -90,7 +96,11 @@ namespace Restaraunt_Lobanov.Controllers
                     {
                         x.Address,
                         x.Date,
-                        x.Dishes
+                        Dishes = x.Dishes.Select(d => new
+                        {
+                            d.DishId,
+                            d.Count
+                        })
                     }).ToList();
 
                 return Ok(history);
@@ -101,7 +111,7 @@ namespace Restaraunt_Lobanov.Controllers
             }
         }
 
-        [ApiExplorerSettings(GroupName = "v1")]
+
         /// <summary>
         /// Отправить заказ
         /// </summary>
@@ -109,12 +119,13 @@ namespace Restaraunt_Lobanov.Controllers
         /// <response code="200">Заказ принят</response>
         /// <response code="400">Проблемы при запросе</response>
         /// <response code="401">Неавторизированный доступ</response>
+        [ApiExplorerSettings(GroupName = "v1")]
         [Route("order")]
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        public ActionResult CreateOrder([FromHeader] string token, [FromBody] Order order)
+        public ActionResult CreateOrder([FromBody] OrderRequest request, [FromHeader] string token)
         {
             DishContext context = new DishContext();
 
@@ -127,18 +138,28 @@ namespace Restaraunt_Lobanov.Controllers
                     return StatusCode(401);
                 }
 
-                order.UserId = userId.Value;
+                var order = new Order
+                {
+                    UserId = userId.Value,
+                    Address = request.Address,
+                    Date = request.Date,
+                    Dishes = request.Dishes.Select(d => new OrderDish
+                    {
+                        DishId = d.DishId,
+                        Count = d.Count
+                    }).ToList()
+                };
 
                 context.Orders.Add(order);
                 context.SaveChanges();
 
-                return StatusCode(200);
+                return Ok(new { message = "Заказ принят", orderId = order.OrderId });
             }
-            catch
+            catch (Exception ex)
             {
-                return StatusCode(400);
+                return StatusCode(400, new { error = ex.Message });
             }
         }
     }
-    
+
 }

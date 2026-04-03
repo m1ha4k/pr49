@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Restaraunt_Lobanov.Models;
 
 namespace Restaraunt_Lobanov.Context
 {
